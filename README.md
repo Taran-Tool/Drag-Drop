@@ -1,5 +1,6 @@
 1. Для управления мышью задействую интерфейсы  IPointerDownHandler, IDragHandler, IPointerUpHandler и реализую их методы, а также задам несколько параметров.
 
+```csharp
 public class DragandDrop : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     private Vector3 _offset; 
@@ -16,9 +17,9 @@ public class DragandDrop : MonoBehaviour, IPointerDownHandler, IDragHandler, IPo
     private float scrollVelocity = 0f;
 	
 	...
-
+```
 2. Стартую, не пробуждаюсь, и задаю значения параметрам
-
+```csharp
 void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -40,9 +41,9 @@ void Start()
 
         _rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
     }
-
+```
 3. Каждый кадр делаю:
-
+```csharp
 void Update()
     {
         HandleBackgroundScroll();																//обрабатываю скролл (хотя лучше это вынести в отдельный скрипт, в будущем)
@@ -80,8 +81,9 @@ void Update()
             }
         }
     }
-	
+```	
 4. Как тоолько нажал на объект (Событие такое)
+```csharp
 	public void OnPointerDown(PointerEventData eventData)				
     {
         _isDragging = true;												//тащу и это верно
@@ -89,8 +91,9 @@ void Update()
         _offset = transform.position - (Vector3) eventData.position;
         SetKinematic();													//объект не поддается гравитации
     }
-	
+```	
 5. Тащу объект (Событие такое)
+```csharp
 	public void OnDrag(PointerEventData eventData) 														
     {
         if (_isDragging)
@@ -101,24 +104,27 @@ void Update()
             SetKinematic();																				//объект не поддается гравитации
         }
     }
-	
+```	
 6. Отпустил объект (Последнее событие)
+```csharp
 	public void OnPointerUp(PointerEventData eventData)
     {
         _isDragging = false;		//нет не тащу и это верно)
         SetDynamic();				//гравитация начала действовать
         CheckIfOnShelf();			//проверяю есть ли полка рядом
     }
-	
+```	
 7. Включаю гравитацию
+```csharp
 	private void SetDynamic()
     {
         _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         _rigidbody2D.gravityScale = 1;
         _rigidbody2D.AddForce(new Vector2(0, -50), ForceMode2D.Impulse);	//немного толкаю объект, чтобы он быстрее падал, красиво
     }
-
+```
 8.  Отключаю гравитацию, сбрасываю все ускорения
+```csharp
 	private void SetKinematic()
     {
         _rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
@@ -126,8 +132,9 @@ void Update()
         _rigidbody2D.linearVelocity = Vector2.zero;
         _rigidbody2D.angularVelocity = 0;
     }
-
+```
 9. Проверяю не выходит ли объект за границы подложки - Background
+```csharp
 	private void BoundsCheck(Vector3 position)
     {
         position.x = Mathf.Clamp(position.x, bgCollider.bounds.min.x + (objectRectTransform.rect.width / 1.5f), bgCollider.bounds.max.x - (objectRectTransform.rect.width / 1.5f));
@@ -135,8 +142,9 @@ void Update()
 
         transform.position = position;
     }
-
+```
 10. Проверяю находится ли объект над полкой (слой Shelf, тег Shelf)
+```csharp
 	private void CheckIfOnShelf()
     {
         int layerMask = LayerMask.GetMask("Shelf"); 													//буду "стрелять" только по полкам
@@ -155,8 +163,9 @@ void Update()
             SetKinematic();																				//объект не поддается гравитации
         }
     }
-
+```
 11. Скролю задний план (подложка Background) с помощью мыши. Для сенсора не реализовал. А мог бы... )
+```csharp
 	private void HandleBackgroundScroll()
     {
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
@@ -175,8 +184,9 @@ void Update()
 
         bgRectTransform.position = new Vector3(Mathf.Clamp(bgRectTransform.position.x, minX, maxX), bgRectTransform.position.y, bgRectTransform.position.z);
     }
-	
+```	
 12. Инерция. Добавил инерцию к скроллу, так будет повеселей.
+```csharp
 
 	...
 	private void ApplyInertia()
@@ -191,3 +201,4 @@ void Update()
         }
     }
 }
+```
